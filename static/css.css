@@ -1,0 +1,85 @@
+
+
+body {
+   
+ background-image: url(Fon.jpg);
+ background-repeat: no-repeat;
+ background-size: cover;
+
+}
+
+.header_name {
+   height: 100px;
+   width: 100%;
+   background-image: url(Header.jpg);
+    background-repeat: no-repeat;
+   background-size: cover;
+   text-align: center;
+  color:rgb(213, 182, 117);
+  font-weight: 600;
+  font-size: 36px;
+  text-transform: uppercase;
+}
+
+
+
+#area_game{
+   width: 1004px;
+   margin: auto;
+   padding: 0px;
+   position: relative;
+}
+ 
+
+#pole{
+ background-color: rgb(126, 126, 126);
+  opacity: 0.6;
+
+}
+
+p{
+   color: rgb(168, 28, 28);
+   font-size: 25px;
+   font-weight: 900;
+   text-align: center;
+   
+}
+
+#pole > tbody>tr>td{
+  
+   width: 80px;
+   height: 80px;
+  border: 1px solid green;
+   cursor: pointer;
+}
+
+#pole>tbody>tr>td:not(:nth-child(1)):hover::after {
+   content: attr(data-title);
+   padding-left: 20px;
+   font-size: 35px;
+   color: rgba(28, 255, 104, 0.7);
+}
+
+.cross{
+  background: url(cross.png) no-repeat center center !important;
+  transition: 0.5;
+  opacity: 1;
+}
+
+.dead_cross{
+   background: url(dead_cross.png) no-repeat center center !important;
+   transition: 0.5;
+   opacity: 1;
+ }
+
+.zero{
+   background: url(nolik0.png) no-repeat center center !important;
+   transition: 0.5;
+   opacity: 1;
+}
+
+.dead_zero{
+   background: url(dead_nolik.png) no-repeat center center !important;
+   transition: 0.5;
+   opacity: 1;
+}
