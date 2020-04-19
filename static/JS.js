@@ -1,3 +1,43 @@
+
+
+//а вот тут функция запроса на сервак
+var request = {
+
+publish: function(c){
+var xhr = new XMLHttpRequest();
+xhr.open('POST','publish', true);
+var s = JSON.stringify(c);
+
+xhr.send(s);
+
+return false;
+},
+
+subscribe: function() {
+ 
+  var xhr = new XMLHttpRequest();
+
+  xhr.open("GET", "/subscribe", true);
+
+  xhr.onload = function () {
+     
+      var li = "";
+      li = this.responseText;
+      controller.turnC(li);
+      request.subscribe();
+  };
+
+  xhr.openerror = xhr.onabort = function () {
+      setTimeout(subscribe, 500)
+  };
+
+  xhr.send('');
+}
+
+};
+
+
+//Предствалние 
 var view = {
   showCross : function(id){
     var cr = document.getElementById(id);
@@ -43,7 +83,7 @@ var model = {
 
    openCross: ["00"],
    openZero: ["55"],  
-   emptyBlocks: [],
+   
 
    turn: function(id){
      
@@ -66,15 +106,6 @@ var model = {
     }
    },
 
-   createEmptyBloks: function(id){
-    var elCell = document.getElementsByTagName("td");
-    for(var i = 0; i < (elCell.length)-1; i++){
-      if (elCell[i].id !=="" && elCell[i].id !=="00" ){
-        model.emptyBlocks.push(elCell[i].id);
-         };
-        }
-   },
-
    selectClassBoks: function(){
      if(model.classN == "zero"){return model.openZero};
      if(model.classN == "cross"){return model.openCross};
@@ -84,18 +115,18 @@ var model = {
     if(model.classN == "zero"){return "cross"};
     if(model.classN == "cross"){return "zero"};
    },
-   deadClassBoks: function(){
-    if(model.classN == "zero"){return "dead_zero"};
-    if(model.classN == "cross"){return "dead_cross"};
+   deadClassBoks: function(el){
+    if(el == "zero"){return "dead_zero"};
+    if(el == "cross"){return "dead_cross"};
    },
 
    YesOrNot: function(arr,el){
      var a = document.getElementById(el).className;
-     if (a === controller.c ){return false}
+     if (a === controller.c ){return false};
      if (a === model.classN){return false };
+     if (a === model.deadClassBoks(model.reversClassBoks())){return false};
     for (var i=0; i< arr.length; i++){
       if (el == arr[i]){return false};
-      
     }
        return true;
    },
@@ -105,13 +136,11 @@ var model = {
     for(var i = 0; i < el.length;i++){
      if (el[i] == 'empty' || el[i]===c){continue};
      arrBuff.push(el[i]);
-
     };
     if(model.classN === "zero"){model.openZero = arrBuff};
     if(model.classN === "cross"){model.openCross = arrBuff};
     delete arrBuff;
-  }
-  
+  },
 
 };
 //тут контролер будет
@@ -125,7 +154,6 @@ var controller = {
     if(c == selected[i]){
       break;
     }
-
    };
     if(c == selected[i]){
      var id = c;
@@ -135,29 +163,34 @@ var controller = {
      var nRow;
      var potentialBlocks=[];
      
-      for (var j = 0; j<3; j++){
+     
+      for (var j = 0; j<3; j++){ //выбор строки
         nRow = fRow - 1 + j;
-         if(nRow<0 || nRow>5){continue}
-        for (var i = 0; i<3; i++ ){
+         if(nRow<0 || nRow>5){continue} // проверка на выход за граниицы 
+        for (var i = 0; i<3; i++ ){ // проверка по столбцам
           nCall = fCall - 1 + i;
-           if (nCall<0 || nCall>5){continue}
-           if (document.getElementById(""+nRow + nCall).className === model.deadClassBoks() ){continue}
-           if (document.getElementById(""+nRow + nCall).className === revers && c === (""+nRow + nCall)){continue}
+           if (nCall<0 || nCall>5){continue}//выход за границы
+           if (document.getElementById(""+nRow + nCall).className === model.deadClassBoks(model.classN) ){continue} // так это работает
+           if (document.getElementById(""+nRow + nCall).className === revers && c == (""+nRow + nCall)){continue}
+           if (document.getElementById(c).className == revers && document.getElementById(""+nRow + nCall).className == revers){ 
+            continue;
+           }
            potentialBlocks.push(""+nRow + nCall);
-        }
        }
       
        for (var i = 0; i < potentialBlocks.length; i++){
           if (model.YesOrNot(selected, potentialBlocks[i])){selected.push(potentialBlocks[i])};
+          
+        }
        }
        delete potentialBlocks;
+         
        model.clear(c, selected); 
      model.turn(c);    
     }
      else {
        var mss = "Не туда, читай правила";
       view.msg(mss);
-
      }
 
   },
@@ -173,7 +206,8 @@ var controller = {
          
           e.target.onclick = function(){
            var c = this.getAttribute("id");
-           controller.turnC(c);
+           request.publish(c);
+           //controller.turnC(c);
            this.setAttribute("data-title","");
           };
         } 
@@ -204,8 +238,6 @@ var controller = {
 
 };
 
-//анонимная функция
-
 (function(){
   var war = {
      init: function(){
@@ -216,20 +248,16 @@ var controller = {
 
      main: function(){ 
        
-
      },
 
      control: function(){
-       controller.createDataTitle();
-       model.createEmptyBloks("tbody");
+       controller.createDataTitle(); 
+       request.subscribe();
      },
 
      event: function(){
-        
         controller.hoverClick("tbody");
-        
      }
-
   };
 
   war.init();
